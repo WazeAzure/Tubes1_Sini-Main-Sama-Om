@@ -9,11 +9,16 @@ from game.logic.random import RandomLogic
 from game.util import *
 from game.logic.base import BaseLogic
 
+# User Defined Algorithm
+from game.logic.VersiEdbert import EdBot
+
+
 init()
 BASE_URL = "http://localhost:8082/api"
 DEFAULT_BOARD_ID = 1
 CONTROLLERS = {
     "Random": RandomLogic,
+    "EdBot" : EdBot,
 }
 
 ###############################################################################
