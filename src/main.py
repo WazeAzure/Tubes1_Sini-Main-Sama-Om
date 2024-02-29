@@ -16,7 +16,8 @@ from game.logic.random_diamond import RandomDiamondLogic
 
 
 init()
-BASE_URL = "http://localhost:8082/api"
+# BASE_URL = "http://localhost:8082/api"
+BASE_URL = "http://172.26.160.1:8082/api"
 DEFAULT_BOARD_ID = 1
 CONTROLLERS = {
     "Random": RandomLogic,
