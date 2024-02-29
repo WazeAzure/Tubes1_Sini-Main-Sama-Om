@@ -11,6 +11,7 @@ from game.logic.base import BaseLogic
 
 # User Defined Algorithm
 from game.logic.VersiEdbert import EdBot
+from game.logic.VersiVanson import VanBot
 from game.logic.FirstDiamondLogic import FirstDiamondLogic
 from game.logic.random_diamond import RandomDiamondLogic
 
@@ -22,6 +23,7 @@ DEFAULT_BOARD_ID = 1
 CONTROLLERS = {
     "Random": RandomLogic,
     "EdBot" : EdBot,
+    "VanBot" : VanBot,
     "FDL" : FirstDiamondLogic,
     "RDL" : RandomDiamondLogic,
 }
