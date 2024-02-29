@@ -52,6 +52,8 @@ class VanBot(BaseLogic):
         dist_y = abs(self.current_position.y - x.position.y)
 
         dist = self.get_distance(self.current_position, x.position)
+        if (x.properties.points == 2) : # WEIGH : membuat diamond merah berprioritas lebih tinggi
+            dist /= 2 
         return [x.id, x.position, x.properties.points, dist]
 
     def handle_diamonds(self, board_bot: GameObject, board: Board):
@@ -105,7 +107,7 @@ class VanBot(BaseLogic):
             )
         else:
             print("TAKE DIAMOND")
-            if (board_bot.properties.diamonds == 4) : # minor fix supaya bot ga invalid maksa makan diamond merah
+            if (board_bot.properties.diamonds == 4 and self.diamond_list[0][2] == 2) : # minor fix supaya bot ga invalid maksa makan diamond merah
                 self.diamond_target = self.diamond_list[1][1]
             else :
                 self.diamond_target = self.diamond_list[0][1]
