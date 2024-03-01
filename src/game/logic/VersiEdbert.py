@@ -14,8 +14,9 @@ class EdBot(BaseLogic):
         - TeleportGameObject
         - DiamondGameObject
         - BaseGameObject
-        - DiamondButtonGameObject
+        - DiamondButtonGameObject / RESET BUTTON
         - BotGameObject
+        - 
     '''
     def __init__(self) -> None:
         self.directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
@@ -27,6 +28,9 @@ class EdBot(BaseLogic):
         self.base: Optional[Position] = None
         self.diamond_target: Optional[Position] = None
         self.init = False
+        self.enemy_bots = []
+        self.teleporter = []
+        self.reset_button: list[GameObject] = []
 
     def details(self, board_bot: GameObject, board: Board):
         properties = board_bot.properties
@@ -48,9 +52,6 @@ class EdBot(BaseLogic):
         return dist
     
     def closest_diamond(self, x: GameObject):
-        dist_x = abs(self.current_position.x - x.position.x)
-        dist_y = abs(self.current_position.y - x.position.y)
-
         dist = self.get_distance(self.current_position, x.position)
         return [x.id, x.position, x.properties.points, dist]
 
@@ -66,10 +67,24 @@ class EdBot(BaseLogic):
     def time_to_base(self, board_bot: GameObject):
         print(self.get_distance(self.current_position, self.base))
         print(board_bot.properties.milliseconds_left)
-        if self.get_distance(self.current_position, self.base) >= (board_bot.properties.milliseconds_left // 1000):
+        if self.get_distance(self.current_position, self.base)+1 >= (board_bot.properties.milliseconds_left // 1000):
             return True
         return False
-
+    
+    def set_enemy_info(self, board_bot: GameObject, board: Board):
+        self.enemy_bots = []
+        for x in board.bots:
+            if x.id != board_bot.id:
+                self.enemy_bots.append([x.id, x.position, x.properties.diamonds])
+    
+    def set_info(self, board_bot: GameObject, board: Board) -> None:
+        self.teleporter = []
+        for x in board.game_objects:
+            if x.type == "TeleportGameObject":
+                self.teleporter.append([x.id, x.position, x.properties.pair_id, 0])
+            elif x.type == "DiamondButtonGameObject":
+                self.reset_button.append(x)
+    
     def next_move(self, board_bot: GameObject, board: Board) -> Tuple[int, int]:
         
         print(board.game_objects)
@@ -105,7 +120,6 @@ class EdBot(BaseLogic):
             )
         else:
             print("TAKE DIAMOND")
-            self.tackle(board_bot, board)
             if (board_bot.properties.diamonds == 4 and self.diamond_list[0][2] == 2) : # minor fix supaya bot ga invalid maksa makan diamond merah
                 self.diamond_target = self.diamond_list[1][1]
             else :
