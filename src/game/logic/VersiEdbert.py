@@ -19,9 +19,7 @@ class EdBot(BaseLogic):
         - 
     '''
     def __init__(self) -> None:
-        self.directions = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-        self.my_attribute = 0
-        self.goal_position = None
+        self.goal_position: list[int, int] = None
         self.current_position: Optional[Position] = None
         self.current_direction = 0
         self.diamond_list = []
@@ -46,17 +44,35 @@ class EdBot(BaseLogic):
         # print(GameObject.properties.base)
     
     def get_distance(self, a: Position, b: Position):
+        '''
+        Get distance of 2 position
+        '''
         dist_x = abs(a.x - b.x)
         dist_y = abs(a.y - b.y)
         dist = dist_x + dist_y
         return dist
-    
+
+    def get_distance_teleporter(self, a: Position, b: Position) -> int:
+        '''
+        Get distance relative to teleporter
+        '''
+        dist_x = abs(a.x - self.teleporter[0][1].x) + abs(self.teleporter[1][1].x - a.x)
+        dist_y = abs(a.y - self.teleporter[0][1].y) + abs(self.teleporter[1][1].y - a.y)
+        dist = dist_x + dist_y
+        return dist
+
     def closest_diamond(self, x: GameObject):
+        '''
+        Count distance of closest diamonds
+        '''
         dist = self.get_distance(self.current_position, x.position)
-        return [x.id, x.position, x.properties.points, dist]
+        dist2 = self.get_distance_teleporter(self.current_position, x.position)
+        if(min(dist, dist2) == dist2):
+            return [x.id, x.position, x.properties.points, dist, True]
+        return [x.id, x.position, x.properties.points, dist, False]
 
     def handle_diamonds(self, board_bot: GameObject, board: Board):
-        self.diamond_list = [[x.id, x.position, x.properties.points, 0] for x in board.diamonds]
+        self.diamond_list = [[x.id, x.position, x.properties.points, 0, None] for x in board.diamonds]
 
         self.diamond_list = list(map(self.closest_diamond, board.diamonds))
 
@@ -67,7 +83,7 @@ class EdBot(BaseLogic):
     def time_to_base(self, board_bot: GameObject):
         print(self.get_distance(self.current_position, self.base))
         print(board_bot.properties.milliseconds_left)
-        if self.get_distance(self.current_position, self.base)+1 >= (board_bot.properties.milliseconds_left // 1000):
+        if self.get_distance(self.current_position, self.base)+2.5 >= (board_bot.properties.milliseconds_left // 1000):
             return True
         return False
     
@@ -81,13 +97,17 @@ class EdBot(BaseLogic):
         self.teleporter = []
         for x in board.game_objects:
             if x.type == "TeleportGameObject":
-                self.teleporter.append([x.id, x.position, x.properties.pair_id, 0])
+                dist = self.get_distance(self.current_position, x.position)
+                self.teleporter.append([x.id, x.position, x.properties.pair_id, dist])
             elif x.type == "DiamondButtonGameObject":
                 self.reset_button.append(x)
+            
+        # sort teleporter
+        def func(e):
+            return e[3]
+        self.teleporter.sort(key=func)
     
     def next_move(self, board_bot: GameObject, board: Board) -> Tuple[int, int]:
-        
-        print(board.game_objects)
         start_time = time.time()
         # initialize var on run time
         if not self.init:
@@ -96,6 +116,9 @@ class EdBot(BaseLogic):
 
         # get current location
         self.current_position = board_bot.position
+
+        # set info teleporter and reset button
+        self.set_info(board_bot, board)
 
         # get diamonds location
         self.handle_diamonds(board_bot, board)
@@ -108,6 +131,13 @@ class EdBot(BaseLogic):
                 self.base.x, 
                 self.base.y
             )
+            if(self.current_position.x + self.goal_position[0] == self.teleporter[0][1].x):
+                self.goal_position[0] = 0
+                self.goal_position[1] = 1
+            elif(self.current_position.y + self.goal_position[1] == self.teleporter[0][1].y):
+                self.goal_position[0] = 1
+                self.goal_position[1] = 0
+
 
         # if inventory full return to base
         elif board_bot.properties.diamonds == 5:
@@ -118,12 +148,18 @@ class EdBot(BaseLogic):
                 self.base.x, 
                 self.base.y
             )
+
+        # take diamonds
         else:
             print("TAKE DIAMOND")
             if (board_bot.properties.diamonds == 4 and self.diamond_list[0][2] == 2) : # minor fix supaya bot ga invalid maksa makan diamond merah
                 self.diamond_target = self.diamond_list[1][1]
             else :
-                self.diamond_target = self.diamond_list[0][1]
+                if(self.diamond_list[0][4]):
+                    self.diamond_target = self.teleporter[0][1]
+                else:
+                    self.diamond_target = self.diamond_list[0][1]
+
             self.goal_position = get_direction(
                 self.current_position.x,
                 self.current_position.y,
