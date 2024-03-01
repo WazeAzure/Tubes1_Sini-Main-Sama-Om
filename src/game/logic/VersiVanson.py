@@ -29,6 +29,8 @@ class VanBot(BaseLogic):
         self.init = False
         self.enemy_bots = []
         self.ijin_tackle = True #true itu boleh tackle
+        self.teleporter = []
+        self.reset_button = []
 
     def details(self, board_bot: GameObject, board: Board):
         properties = board_bot.properties
@@ -92,7 +94,6 @@ class VanBot(BaseLogic):
         return 0, x[1]
     
     def next_move(self, board_bot: GameObject, board: Board) -> Tuple[int, int]:
-        
         print(board.game_objects)
         start_time = time.time()
         # initialize var on run time
