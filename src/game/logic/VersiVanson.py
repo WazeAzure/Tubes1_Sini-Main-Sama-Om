@@ -30,7 +30,7 @@ class VanBot(BaseLogic):
         self.enemy_bots = []
         self.ijin_tackle = True #true itu boleh tackle
         self.teleporter = []
-        self.reset_button = []
+        self.reset_button: list[GameObject] = []
 
     def details(self, board_bot: GameObject, board: Board):
         properties = board_bot.properties
@@ -56,15 +56,22 @@ class VanBot(BaseLogic):
         dist_y = abs(self.current_position.y - x.position.y)
 
         dist = self.get_distance(self.current_position, x.position)
+
         if (x.properties.points == 2) : # WEIGH : membuat diamond merah berprioritas lebih tinggi
-            dist /= 2 
+            dist /= 2
+        elif (x.properties.points == 0.75) :
+            dist /= 0.75
         return [x.id, x.position, x.properties.points, dist]
 
     def handle_diamonds(self, board_bot: GameObject, board: Board):
-        self.diamond_list = [[x.id, x.position, x.properties.points, 0] for x in board.diamonds]
+        # self.diamond_list = [[x.id, x.position, x.properties.points, 0] for x in board.diamonds]
+        # self.diamond_list.append(self.reset_button[0].id, self.reset_button[0].position, 0.75, 0)
+        self.reset_button[0].properties.points = 0.75
 
         self.diamond_list = list(map(self.closest_diamond, board.diamonds))
-
+        self.diamond_list.append(self.closest_diamond(self.reset_button[0]))
+        
+        # sorting closest
         def func(e):
             return e[3]
         self.diamond_list.sort(key=func)
@@ -82,6 +89,14 @@ class VanBot(BaseLogic):
             if x.id != board_bot.id:
                 self.enemy_bots.append([x.id, x.position, x.properties.diamonds])
 
+    def set_info(self, board_bot: GameObject, board: Board) -> None:
+        self.teleporter = []
+        for x in board.game_objects:
+            if x.type == "TeleportGameObject":
+                self.teleporter.append([x.id, x.position, x.properties.pair_id, 0])
+            elif x.type == "DiamondButtonGameObject":
+                self.reset_button.append(x)
+
     def tackle(self, board_bot: GameObject, board: Board) -> Tuple [int, Position] : #0 itu aman, 1 itu passive tackle, 2 itu diam
         jarak = [0 for i in range(len(self.enemy_bots))]
         for i, x in enumerate (self.enemy_bots) :
@@ -90,11 +105,10 @@ class VanBot(BaseLogic):
                 return 1, x[1]
         for i in range(len(jarak)) :
             if (jarak[i] == 2) :
-                return 2, x[1]
-        return 0, x[1]
+                return 2, self.current_position
+        return 0, self.current_position
     
     def next_move(self, board_bot: GameObject, board: Board) -> Tuple[int, int]:
-        print(board.game_objects)
         start_time = time.time()
         # initialize var on run time
         if not self.init:
@@ -107,10 +121,14 @@ class VanBot(BaseLogic):
         # get current location
         self.current_position = board_bot.position
 
+        # set teleporter and reset location
+        self.set_info(board_bot, board)
+
         # get diamonds location
         self.handle_diamonds(board_bot, board)
-            
+        
         tackle = self.tackle(board_bot, board)
+        print("tackle =", tackle[0])
         if (tackle[0] == 1 and self.ijin_tackle) :
             print("TACKLE")
             self.ijin_tackle = False
@@ -150,6 +168,8 @@ class VanBot(BaseLogic):
                 )
             else:
                 print("TAKE DIAMOND")
+                print(self.diamond_target)
+
                 self.tackle(board_bot, board)
                 if (board_bot.properties.diamonds == 4 and self.diamond_list[0][2] == 2) : # minor fix supaya bot ga invalid maksa makan diamond merah
                     self.diamond_target = self.diamond_list[1][1]
