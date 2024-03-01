@@ -105,7 +105,11 @@ class EdBot(BaseLogic):
             )
         else:
             print("TAKE DIAMOND")
-            self.diamond_target = self.diamond_list[0][1]
+            self.tackle(board_bot, board)
+            if (board_bot.properties.diamonds == 4 and self.diamond_list[0][2] == 2) : # minor fix supaya bot ga invalid maksa makan diamond merah
+                self.diamond_target = self.diamond_list[1][1]
+            else :
+                self.diamond_target = self.diamond_list[0][1]
             self.goal_position = get_direction(
                 self.current_position.x,
                 self.current_position.y,

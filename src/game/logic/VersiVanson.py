@@ -28,6 +28,7 @@ class VanBot(BaseLogic):
         self.diamond_target: Optional[Position] = None
         self.init = False
         self.enemy_bots = []
+        self.ijin_tackle = True #true itu boleh tackle
 
     def details(self, board_bot: GameObject, board: Board):
         properties = board_bot.properties
@@ -69,7 +70,7 @@ class VanBot(BaseLogic):
     def time_to_base(self, board_bot: GameObject):
         print(self.get_distance(self.current_position, self.base))
         print(board_bot.properties.milliseconds_left)
-        if self.get_distance(self.current_position, self.base) >= (board_bot.properties.milliseconds_left // 1000) // 1.1:
+        if self.get_distance(self.current_position, self.base)+1 >= (board_bot.properties.milliseconds_left // 1000) // 1.1:
             return True
         return False
 
@@ -107,24 +108,27 @@ class VanBot(BaseLogic):
 
         # get diamonds location
         self.handle_diamonds(board_bot, board)
-
-
+            
         tackle = self.tackle(board_bot, board)
-        if (tackle[0] == 1) :
+        if (tackle[0] == 1 and self.ijin_tackle) :
+            print("TACKLE")
+            self.ijin_tackle = False
             self.goal_position = get_direction(
                     self.current_position.x, 
                     self.current_position.y, 
                     tackle[1].x, 
                     tackle[1].y
                 )
-        elif (tackle[0] == 2) :
+        elif (tackle[0] == 2 and self.ijin_tackle) :
+            print("DIAM")
             self.goal_position = get_direction(
                     self.current_position.x, 
                     self.current_position.y, 
-                    tackle[1].x, 
-                    tackle[1].y
+                    self.current_position.x, 
+                    self.current_position.y
                 )
         else :
+            self.ijin_tackle = True
             if self.time_to_base(board_bot):
                 print("TIME TO GO HOME")
                 self.goal_position = get_direction(
