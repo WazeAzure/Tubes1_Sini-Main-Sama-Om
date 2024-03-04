@@ -146,6 +146,8 @@ class OptBot:
         if (board_bot.properties.diamonds == 5):
             self.target_position = self.base_position
         else:
+            if(board_bot.properties.diamonds + self.list_objective[0][1] > board_bot.properties.inventory_size):
+                self.list_objective.pop(0)
             self.target_position = self.list_objective[0][0]
 
         # get position
