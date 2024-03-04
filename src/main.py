@@ -17,7 +17,6 @@ from game.logic.FirstDiamondLogic import FirstDiamondLogic
 from game.logic.random_diamond import RandomDiamondLogic
 from game.logic.OptBot import OptBot
 from game.logic.DenBot import DenBot
-from game.logic.VanBot import VanBot
 
 
 init()
@@ -32,7 +31,6 @@ CONTROLLERS = {
     "FDL" : FirstDiamondLogic,
     "RDL" : RandomDiamondLogic,
     "OptBot" : OptBot,
-    "VanBot": VanBot,
     "DenBot": DenBot,
 }
 

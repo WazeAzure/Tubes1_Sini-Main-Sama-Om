@@ -89,6 +89,8 @@ class OptBot:
 
         obj structure `[[Position(x, y), points, priority], ...]`
         """
+
+
         obj[2] = min(
             self.get_distance(self.current_position, obj[0]),
             self.get_distance_teleporter(self.current_position, obj[0])
@@ -117,12 +119,14 @@ class OptBot:
         self.list_objective.sort(key=func)
 
     def go_to_destination(self) -> None:
-        """"
+        """
         go to destination
         """
         dist_normal = self.get_distance(self.current_position, self.target_position)
         dist_teleporter = self.get_distance_teleporter(self.current_position, self.target_position)
 
+        print("dist normal : ", dist_normal)
+        print("dist teleporter : ", dist_teleporter)
         if(dist_teleporter < dist_normal):
             # get closest teleporter
             self.target_position = self.teleporter[0]
@@ -144,8 +148,12 @@ class OptBot:
 
         self.initialize(board_bot, board)
 
+        print("current position = ", end='')
+        print(self.current_position)
+
         # set destination
         if (board_bot.properties.diamonds == 5):
+            print("INVENTORY PENUH")
             self.target_position = self.base_position
         else:
             if(board_bot.properties.diamonds + self.list_objective[0][1] > board_bot.properties.inventory_size):
@@ -153,7 +161,11 @@ class OptBot:
             self.target_position = self.list_objective[0][0]
 
         # get position
+        print("Teleporter position : ", end="")
+        print(self.teleporter[0])
         self.go_to_destination()
+        print("Target position : ", end='')
+        print(self.target_position)
 
         # get direction
         direction = get_direction(
