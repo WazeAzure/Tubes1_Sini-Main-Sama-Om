@@ -15,6 +15,7 @@ from game.logic.VersiVanson import VanBot
 from game.logic.versigalang import Gabot
 from game.logic.FirstDiamondLogic import FirstDiamondLogic
 from game.logic.random_diamond import RandomDiamondLogic
+from game.logic.OptBot import OptBot
 
 
 init()
@@ -28,6 +29,7 @@ CONTROLLERS = {
     "Gabot" : Gabot,
     "FDL" : FirstDiamondLogic,
     "RDL" : RandomDiamondLogic,
+    "OptBot": OptBot,
 }
 
 ###############################################################################
