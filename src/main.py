@@ -16,6 +16,7 @@ from game.logic.versigalang import Gabot
 from game.logic.FirstDiamondLogic import FirstDiamondLogic
 from game.logic.random_diamond import RandomDiamondLogic
 from game.logic.OptBot import OptBot
+from game.logic.DenBot import DenBot
 
 
 init()
@@ -30,6 +31,7 @@ CONTROLLERS = {
     "FDL" : FirstDiamondLogic,
     "RDL" : RandomDiamondLogic,
     "OptBot": OptBot,
+    "DenBot": DenBot,
 }
 
 ###############################################################################

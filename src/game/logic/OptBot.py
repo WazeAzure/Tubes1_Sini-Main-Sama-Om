@@ -127,13 +127,7 @@ class OptBot:
             # get closest teleporter
             self.target_position = self.teleporter[0]
         
-
-    def next_move(self, board_bot: GameObject, board: Board) -> Tuple[int, int]:
-        '''
-        default function *main game loop*!
-        '''
-        time_start = time.time()
-
+    def initialize(self, board_bot : GameObject, board: Board) :
         # init once
         self.set_info_once(board_bot)
 
@@ -141,6 +135,14 @@ class OptBot:
         self.set_current_position(board_bot)
         self.set_teleporter(board)
         self.set_list_objective(board)
+
+    def next_move(self, board_bot: GameObject, board: Board) -> Tuple[int, int]:
+        '''
+        default function *main game loop*!
+        '''
+        time_start = time.time()
+
+        self.initialize(board_bot, board)
 
         # set destination
         if (board_bot.properties.diamonds == 5):
