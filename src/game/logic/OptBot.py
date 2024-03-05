@@ -26,7 +26,7 @@ class OptBot:
         '''
         self.teleporter: list[Position] = []
         '''
-        list of teleporter position `[Position(x, y), ...] - object`
+        list of teleporter position `[[Position(x, y), time_left], ...] - object`
         '''
         self.list_objective = []
         '''
@@ -58,11 +58,11 @@ class OptBot:
         """
         set teleporter locations
         """
-        self.teleporter = [x.position for x in board.game_objects if x.type == "TeleportGameObject"]
+        self.teleporter = [[x.position, x.properties.milliseconds_left] for x in board.game_objects if x.type == "TeleportGameObject"]
 
         def func(x):
             """sort teleporter by closest distance to current_position"""
-            return self.get_distance(self.current_position, x)
+            return self.get_distance(self.current_position, x[0])
         self.teleporter.sort(key=func)
     
     def get_distance(self, a: Position, b: Position) -> int:
@@ -81,7 +81,7 @@ class OptBot:
         """
         get distance between 2 position account teleporter to SELF
         """
-        return self.get_distance(a, self.teleporter[0]) + self.get_distance(self.teleporter[1], b)
+        return self.get_distance(a, self.teleporter[0][0]) + self.get_distance(self.teleporter[1][0], b)
 
     def set_priority(self, obj) -> None:
         """
@@ -129,7 +129,7 @@ class OptBot:
         print("dist teleporter : ", dist_teleporter)
         if(dist_teleporter < dist_normal):
             # get closest teleporter
-            self.target_position = self.teleporter[0]
+            self.target_position = self.teleporter[0][0]
         
     def initialize(self, board_bot : GameObject, board: Board) :
         # init once
@@ -139,6 +139,24 @@ class OptBot:
         self.set_current_position(board_bot)
         self.set_teleporter(board)
         self.set_list_objective(board)
+
+    def time_to_go_home(self, board_bot: GameObject):
+        """
+        function to set bot to go home.
+        based on distance from base and time left
+        """
+        dist_normal = self.get_distance(self.current_position, self.base_position)
+        dist_teleporter = self.get_distance_teleporter(self.current_position, self.base_position)
+
+        if (dist_teleporter < dist_normal):
+            if(dist_teleporter >= board_bot.properties.milliseconds_left // 1000):
+                if (self.teleporter[0][1]//1000 > self.get_distance(self.current_position, self.teleporter[0])):
+                    return True
+            return False
+        else:
+            if(dist_normal >= board_bot.properties.milliseconds_left // 1000):
+                return True
+            return False
 
     def next_move(self, board_bot: GameObject, board: Board) -> Tuple[int, int]:
         '''
@@ -152,7 +170,10 @@ class OptBot:
         print(self.current_position)
 
         # set destination
-        if (board_bot.properties.diamonds == 5):
+        if(self.time_to_go_home(board_bot)):
+            print("TIME TO GO HOME")
+            self.target_position = self.base_position
+        elif (board_bot.properties.diamonds == 5):
             print("INVENTORY PENUH")
             self.target_position = self.base_position
         else:
@@ -164,6 +185,10 @@ class OptBot:
         print("Teleporter position : ", end="")
         print(self.teleporter[0])
         self.go_to_destination()
+
+        print("Possible Targets: ", end='')
+        print(self.list_objective[0:5])
+
         print("Target position : ", end='')
         print(self.target_position)
 
