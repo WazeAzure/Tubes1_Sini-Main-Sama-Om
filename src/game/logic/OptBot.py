@@ -193,8 +193,8 @@ class OptBot:
         dist_teleporter = self.get_distance_teleporter(self.current_position, self.base_position)
 
         if (dist_teleporter < dist_normal):
-            if(dist_teleporter >= board_bot.properties.milliseconds_left // 1000):
-                if (self.teleporter[0][1] <= self.get_distance(self.current_position, self.teleporter[0][0])):
+            if(dist_teleporter+2 >= board_bot.properties.milliseconds_left // 1000):
+                if (self.teleporter[0][1]+2 >= self.get_distance(self.current_position, self.teleporter[0][0])):
                     return True
             return False
         else:
