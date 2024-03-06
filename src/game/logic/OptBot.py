@@ -28,6 +28,14 @@ class OptBot:
         '''
         list of teleporter position `[[Position(x, y), time_left], ...] - object`
         '''
+        self.teleporter_anchor: list[str] = []
+        '''
+        list of teleporter anchor id `[id, ...]`
+        '''
+        self.is_teleporter_move: bool = False
+        '''
+        triggered everytime teleporter move
+        '''
         self.list_objective = []
         '''
         list of diamonds and reset buttons.
@@ -37,6 +45,18 @@ class OptBot:
         self.target_position: Optional[Position] = None
         '''
         target position. object `Position(x, y)`
+        '''
+        self.start_time = None
+        '''
+        the time anchor for counting teleporter
+        '''
+        self.teleporter_time_remaining = None
+        '''
+        time left in second till teleporter moved randomly
+        '''
+        self.teleporter_time_config = 30
+        '''
+        time configuration for teleporter random moved in seconds
         '''
 
     def set_current_position(self, board_bot: GameObject) -> None:
@@ -52,13 +72,28 @@ class OptBot:
         """
         if not self.init:
             self.base_position = board_bot.properties.base
+            self.start_time = time.time()
             self.init = True
 
     def set_teleporter(self, board: Board) -> None:
         """
         set teleporter locations
         """
-        self.teleporter = [[x.position, x.properties.milliseconds_left] for x in board.game_objects if x.type == "TeleportGameObject"]
+        self.teleporter.clear()
+        print("teleporter time remaining:", self.teleporter_time_remaining)
+        self.teleporter = [[x.position, self.teleporter_time_remaining] for x in board.game_objects if x.type == "TeleportGameObject"]
+
+        # set anchor and check if teleporter moved
+        temp = [x.position for x in board.game_objects if x.type == "TeleportGameObject"]
+        for x in temp:
+            if x not in self.teleporter_anchor:
+                self.is_teleporter_move = True
+                print("TELEPORTER MOVED")
+        
+        if(self.is_teleporter_move):
+            self.teleporter_anchor.clear()
+            for x in temp:
+                self.teleporter_anchor.append(x)
 
         def func(x):
             """sort teleporter by closest distance to current_position"""
@@ -89,8 +124,6 @@ class OptBot:
 
         obj structure `[[Position(x, y), points, priority], ...]`
         """
-
-
         obj[2] = min(
             self.get_distance(self.current_position, obj[0]),
             self.get_distance_teleporter(self.current_position, obj[0])
@@ -118,7 +151,7 @@ class OptBot:
             return e[2]
         self.list_objective.sort(key=func)
 
-    def go_to_destination(self) -> None:
+    def go_to_destination(self, board_bot: GameObject) -> None:
         """
         go to destination
         """
@@ -127,18 +160,29 @@ class OptBot:
 
         print("dist normal : ", dist_normal)
         print("dist teleporter : ", dist_teleporter)
+
         if(dist_teleporter < dist_normal):
-            # get closest teleporter
-            self.target_position = self.teleporter[0][0]
+            if(dist_teleporter >= board_bot.properties.milliseconds_left // 1000):
+                if (self.teleporter[0][1] <= self.get_distance(self.current_position, self.teleporter[0][0])):
+                    # get closest teleporter
+                    self.target_position = self.teleporter[0][0]
+                    return
+            
+        # self.target_position = self.base_position
         
     def initialize(self, board_bot : GameObject, board: Board) :
-        # init once
+        # init once on run time
         self.set_info_once(board_bot)
+
+        # set time
+        self.teleporter_time_remaining = self.teleporter_time_config - (time.time() - self.start_time)
 
         # info setup
         self.set_current_position(board_bot)
         self.set_teleporter(board)
         self.set_list_objective(board)
+
+        
 
     def time_to_go_home(self, board_bot: GameObject):
         """
@@ -150,7 +194,7 @@ class OptBot:
 
         if (dist_teleporter < dist_normal):
             if(dist_teleporter >= board_bot.properties.milliseconds_left // 1000):
-                if (self.teleporter[0][1]//1000 > self.get_distance(self.current_position, self.teleporter[0])):
+                if (self.teleporter[0][1] <= self.get_distance(self.current_position, self.teleporter[0][0])):
                     return True
             return False
         else:
@@ -166,8 +210,15 @@ class OptBot:
 
         self.initialize(board_bot, board)
 
+        # teleporter check
+        if(self.is_teleporter_move):
+            self.start_time = time.time()
+            self.is_teleporter_move = False
+
         print("current position = ", end='')
         print(self.current_position)
+
+        print("inventory: ", board_bot.properties.diamonds)
 
         # set destination
         if(self.time_to_go_home(board_bot)):
@@ -177,14 +228,20 @@ class OptBot:
             print("INVENTORY PENUH")
             self.target_position = self.base_position
         else:
-            if(board_bot.properties.diamonds + self.list_objective[0][1] > board_bot.properties.inventory_size):
-                self.list_objective.pop(0)
-            self.target_position = self.list_objective[0][0]
+            if(len(self.list_objective) == 0):
+                self.target_position = self.base_position
+            else:
+                while(True):
+                    if(board_bot.properties.diamonds + self.list_objective[0][1] > board_bot.properties.inventory_size):
+                        self.list_objective.pop(0)
+                    else:
+                        self.target_position = self.list_objective[0][0]
+                        break
 
         # get position
         print("Teleporter position : ", end="")
         print(self.teleporter[0])
-        self.go_to_destination()
+        self.go_to_destination(board_bot)
 
         print("Possible Targets: ", end='')
         print(self.list_objective[0:5])
