@@ -122,7 +122,7 @@ class OptBot:
         """
         set priorities for objectives.
 
-        obj structure `[[Position(x, y), points, priority], ...]`
+        obj structure `[Position(x, y), points, priority]`
         """
         obj[2] = min(
             self.get_distance(self.current_position, obj[0]),
@@ -162,8 +162,8 @@ class OptBot:
         print("dist teleporter : ", dist_teleporter)
 
         if(dist_teleporter < dist_normal):
-            if(dist_teleporter >= board_bot.properties.milliseconds_left // 1000):
-                if (self.teleporter[0][1] <= self.get_distance(self.current_position, self.teleporter[0][0])):
+            if(dist_teleporter+2 >= board_bot.properties.milliseconds_left // 1000):
+                if (self.teleporter[0][1]+2 >= self.get_distance(self.current_position, self.teleporter[0][0])):
                     # get closest teleporter
                     self.target_position = self.teleporter[0][0]
                     return
