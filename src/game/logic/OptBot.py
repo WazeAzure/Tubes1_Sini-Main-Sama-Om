@@ -81,6 +81,7 @@ class OptBot:
         """
         self.teleporter.clear()
         print("teleporter time remaining:", self.teleporter_time_remaining)
+        
         self.teleporter = [[x.position, self.teleporter_time_remaining] for x in board.game_objects if x.type == "TeleportGameObject"]
 
         # set anchor and check if teleporter moved
@@ -88,7 +89,7 @@ class OptBot:
         for x in temp:
             if x not in self.teleporter_anchor:
                 self.is_teleporter_move = True
-                print("TELEPORTER MOVED")
+                print("=== TELEPORTER MOVED")
         
         if(self.is_teleporter_move):
             self.teleporter_anchor.clear()
@@ -181,7 +182,6 @@ class OptBot:
         self.set_current_position(board_bot)
         self.set_teleporter(board)
         self.set_list_objective(board)
-
         
 
     def time_to_go_home(self, board_bot: GameObject):
@@ -215,6 +215,7 @@ class OptBot:
             self.start_time = time.time()
             self.is_teleporter_move = False
 
+        print("bot time remaining:", board_bot.properties.milliseconds_left)
         print("current position = ", end='')
         print(self.current_position)
 
@@ -222,21 +223,19 @@ class OptBot:
 
         # set destination
         if(self.time_to_go_home(board_bot)):
-            print("TIME TO GO HOME")
+            print("=== TIME TO GO HOME")
             self.target_position = self.base_position
         elif (board_bot.properties.diamonds == 5):
-            print("INVENTORY PENUH")
+            print("=== INVENTORY PENUH")
             self.target_position = self.base_position
         else:
-            if(len(self.list_objective) == 0):
-                self.target_position = self.base_position
-            else:
-                while(True):
-                    if(board_bot.properties.diamonds + self.list_objective[0][1] > board_bot.properties.inventory_size):
-                        self.list_objective.pop(0)
-                    else:
-                        self.target_position = self.list_objective[0][0]
-                        break
+            if (board_bot.properties.diamonds == 4):
+                # hapus seluruh diamond merah
+                print("=== DIAMOND MERAH DIHAPUS")
+                self.list_objective = filter(lambda x: x[1] != 2, self.list_objective)
+
+                self.target_position = self.list_objective[0][0]
+
 
         # get position
         print("Teleporter position : ", end="")
