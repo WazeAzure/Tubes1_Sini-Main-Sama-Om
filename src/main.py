@@ -17,6 +17,7 @@ from game.logic.FirstDiamondLogic import FirstDiamondLogic
 from game.logic.random_diamond import RandomDiamondLogic
 from game.logic.OptBot import OptBot
 from game.logic.DenBot import DenBot
+from game.logic.Exploit import Exploit
 
 
 init()
@@ -32,6 +33,7 @@ CONTROLLERS = {
     "RDL" : RandomDiamondLogic,
     "OptBot" : OptBot,
     "DenBot": DenBot,
+    "Exploit": Exploit
 }
 
 ###############################################################################
