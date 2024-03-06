@@ -111,7 +111,7 @@ class OptBot:
         temp_objective.append(reset_button[0])
 
         self.list_objective = list(map(self.set_priority, temp_objective))
-
+    
         # sort by priority
         def func(e):
             """sort list_objective by 2nd key - priority"""
