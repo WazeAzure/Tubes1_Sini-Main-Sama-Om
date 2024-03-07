@@ -198,7 +198,7 @@ class OptBot:
                     return True
             return False
         else:
-            if(dist_normal >= board_bot.properties.milliseconds_left // 1000):
+            if(dist_normal+2 >= board_bot.properties.milliseconds_left // 1000):
                 return True
             return False
 
@@ -232,9 +232,9 @@ class OptBot:
             if (board_bot.properties.diamonds == 4):
                 # hapus seluruh diamond merah
                 print("=== DIAMOND MERAH DIHAPUS")
-                self.list_objective = filter(lambda x: x[1] != 2, self.list_objective)
+                self.list_objective = list(filter(lambda x: x[1] != 2, self.list_objective))
 
-                self.target_position = self.list_objective[0][0]
+            self.target_position = self.list_objective[0][0]
 
 
         # get position
