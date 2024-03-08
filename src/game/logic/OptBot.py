@@ -72,7 +72,7 @@ class OptBot:
         """
         if not self.init:
             self.base_position = board_bot.properties.base
-            self.start_time = time.time()
+            self.start_time = time.time() // 1
             self.init = True
 
     def set_teleporter(self, board: Board) -> None:
@@ -176,7 +176,7 @@ class OptBot:
         self.set_info_once(board_bot)
 
         # set time
-        self.teleporter_time_remaining = self.teleporter_time_config - (time.time() - self.start_time)
+        self.teleporter_time_remaining = self.teleporter_time_config - (time.time() // 1 - self.start_time)
 
         # info setup
         self.set_current_position(board_bot)
@@ -212,10 +212,10 @@ class OptBot:
 
         # teleporter check
         if(self.is_teleporter_move):
-            self.start_time = time.time()
+            self.start_time = time.time() // 1
             self.is_teleporter_move = False
 
-        print("bot time remaining:", board_bot.properties.milliseconds_left)
+        print("bot time remaining:", board_bot.properties.milliseconds_left // 1000)
         print("current position = ", end='')
         print(self.current_position)
 
