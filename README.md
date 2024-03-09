@@ -84,6 +84,14 @@ Aturan permainan antara lain:
 7. Terdapat beberapa fitur tambahan seperti teleporter dan red button yang dapat digunakan apabila anda menuju posisi objek tersebut.
 8. Apabila waktu seluruh bot telah berakhir, maka permainan berakhir.
 
+Strategi yang digunakan:
+
+Algoritma greedy yang kami pilih untuk diimplementasikan pada bot merupakan gabungan dari beberapa solusi. Untuk pemilihan diamond mana yang ditarget oleh bot, kami memilih menggunakan diamond by density karena perolehan poin yang lebih space efficient. Diamond Untuk pergerakan bot, kami menggunakan gabungan dari kedua algoritma normal path dan using teleporter. Jika jarak tempuh dari normal path lebih kecil dari jarak tempuh using teleporter, maka bot akan menggunakan arahan dari normal path, begitu juga sebaliknya. Dengan demikian, bot akan mendapatkan arah dari jalur yang paling optimal.
+
+1. Diamond By Density: Bot memilih target diamond yang memiliki poin terbesar relatif terhadap jarak pada bot. Contohnya, jika terdapat diamond dengan poin 1 berjarak 4 dari bot dan terdapat diamond dengan poin 2 berjarak 6 dari bot, maka bot akan menuju diamond dengan poin 2.
+2. Normal Path: Bot bergerak melewati langkah terdekat menuju target destinasi dengan menghitung selisih sumbu x dan sumbu y lalu menjumlahkannya untuk mendapatkan distance. Distance tersebut merupakan total langkah yang perlu dilakukan bot agar mencapai tujuan. Maka, bot dapat menentukan arah gerakan mana dari 4 arah yang tersedia untuk digunakan agar mencapai tujuan.
+3. Using Teleporter: Menghitung distance sama seperti Normal path namun bot menggunakan teleporter untuk mencapai target destinasi. 
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Built With
