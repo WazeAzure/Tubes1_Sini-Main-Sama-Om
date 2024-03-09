@@ -30,7 +30,10 @@ class DenBot(OptBot) :
         """
         get distance between 2 position account teleporter to SELF
         """
-        return min(self.get_distance(a, self.teleporter[0][0]) + self.get_distance(self.teleporter[1][0], b), self.get_distance(a,self.teleporter[1][0]) + self.get_distance(self.teleporter[0][0],b))
+        return min(
+            self.get_distance(a, self.teleporter[0][0]) + self.get_distance(self.teleporter[1][0], b), 
+            self.get_distance(a,self.teleporter[1][0]) + self.get_distance(self.teleporter[0][0],b)
+            )
     
     def set_priority_relativeBase(self, obj) -> None:
         """
