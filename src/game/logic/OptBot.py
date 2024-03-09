@@ -125,10 +125,12 @@ class OptBot:
 
         obj structure `[Position(x, y), points, priority]`
         """
-        obj[2] = min(
+        distance = min(
             self.get_distance(self.current_position, obj[0]),
             self.get_distance_teleporter(self.current_position, obj[0])
         )
+
+        obj[2] = distance / obj[1]
 
         return obj
 
