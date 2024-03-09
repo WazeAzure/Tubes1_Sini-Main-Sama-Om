@@ -26,14 +26,7 @@ BASE_URL = "http://172.26.160.1:8082/api"
 DEFAULT_BOARD_ID = 1
 CONTROLLERS = {
     "Random": RandomLogic,
-    "EdBot" : EdBot,
-    "VanBot" : VanBot,
-    "Gabot" : Gabot,
-    "FDL" : FirstDiamondLogic,
-    "RDL" : RandomDiamondLogic,
     "OptBot" : OptBot,
-    "DenBot": DenBot,
-    "Exploit": Exploit
 }
 
 ###############################################################################
