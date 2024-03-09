@@ -72,7 +72,7 @@ class OptBot:
         """
         if not self.init:
             self.base_position = board_bot.properties.base
-            self.start_time = time.time()
+            self.start_time = time.time() // 1
             self.init = True
 
     def set_teleporter(self, board: Board) -> None:
@@ -178,7 +178,7 @@ class OptBot:
         self.set_info_once(board_bot)
 
         # set time
-        self.teleporter_time_remaining = self.teleporter_time_config - (time.time() - self.start_time)
+        self.teleporter_time_remaining = self.teleporter_time_config - (time.time() // 1 - self.start_time)
 
         # info setup
         self.set_current_position(board_bot)
@@ -194,13 +194,16 @@ class OptBot:
         dist_normal = self.get_distance(self.current_position, self.base_position)
         dist_teleporter = self.get_distance_teleporter(self.current_position, self.base_position)
 
-        if (dist_teleporter < dist_normal):
-            if(dist_teleporter+2 >= board_bot.properties.milliseconds_left // 1000):
-                if (self.teleporter[0][1]+2 >= self.get_distance(self.current_position, self.teleporter[0][0])):
+        # ditambah 2 untuk buffer
+        buffer = 2
+        
+        if (dist_teleporter < dist_normal):    
+            if(dist_teleporter+buffer >= board_bot.properties.milliseconds_left // 1000):
+                if (self.teleporter[0][1]+buffer >= self.get_distance(self.current_position, self.teleporter[0][0])):
                     return True
             return False
         else:
-            if(dist_normal+2 >= board_bot.properties.milliseconds_left // 1000):
+            if(dist_normal+buffer >= board_bot.properties.milliseconds_left // 1000):
                 return True
             return False
 
@@ -214,10 +217,10 @@ class OptBot:
 
         # teleporter check
         if(self.is_teleporter_move):
-            self.start_time = time.time()
+            self.start_time = time.time() // 1
             self.is_teleporter_move = False
 
-        print("bot time remaining:", board_bot.properties.milliseconds_left)
+        print("bot time remaining:", board_bot.properties.milliseconds_left // 1000)
         print("current position = ", end='')
         print(self.current_position)
 
