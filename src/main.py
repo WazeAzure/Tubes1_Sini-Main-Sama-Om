@@ -10,14 +10,8 @@ from game.util import *
 from game.logic.base import BaseLogic
 
 # User Defined Algorithm
-from game.logic.VersiEdbert import EdBot
-from game.logic.VersiVanson import VanBot
-from game.logic.versigalang import Gabot
-from game.logic.FirstDiamondLogic import FirstDiamondLogic
-from game.logic.random_diamond import RandomDiamondLogic
 from game.logic.OptBot import OptBot
-from game.logic.DenBot import DenBot
-from game.logic.Exploit import Exploit
+from game.logic.asisten import AsistenLogic
 
 
 init()
@@ -27,6 +21,7 @@ DEFAULT_BOARD_ID = 1
 CONTROLLERS = {
     "Random": RandomLogic,
     "OptBot" : OptBot,
+    "AstLog": AsistenLogic
 }
 
 ###############################################################################
